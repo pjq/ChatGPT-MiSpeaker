@@ -49,6 +49,7 @@ def parse_cookie_string(cookie_string):
 
 class MiGPT:
     def __init__(self, hardware, conversation_id):
+        print("{__class__.__name__}:{__init__.__name__}")
         self.mi_token_home = Path.home() / ".mi.token"
         self.hardware = hardware
         self.cookie_string = ""
@@ -62,6 +63,7 @@ class MiGPT:
         self.conversation_id = conversation_id
 
     def _init_all_data(self):
+        print("{__class__.__name__}:{_init_all_data.__name__}")
         # Step 1 make sure we init the ai api and servive token
         try:
             # micli mina to make sure the init
@@ -85,6 +87,7 @@ class MiGPT:
         self._init_first_data_and_chatbot()
 
     def _init_data_hardware(self, hardware_data):
+        print("{__class__.__name__}:{_init_data_hardware.__name__}")
         # print(hardware_data)
         for h in hardware_data:
             if h.get("hardware", "") == self.hardware:
@@ -94,6 +97,7 @@ class MiGPT:
             raise Exception(f"we have no hardware: {self.hardware} please check")
 
     def _init_cookie(self):
+        print("{__class__.__name__}:{_init_cookie.__name__}")
         self.cookie_string = COOKIE_TEMPLATE.format(
             device_id=self.device_id,
             service_token=self.service_token,
@@ -102,11 +106,13 @@ class MiGPT:
         self.s.cookies = parse_cookie_string(self.cookie_string)
 
     def _init_first_data_and_chatbot(self):
+        print("{__class__.__name__}:{_init_first_data_and_chatbot.__name__}")
         data = self.get_latest_ask_from_xiaoai()
         self.last_timestamp, self.last_record = self.get_last_timestamp_and_record(data)
         self.chatbot = Chatbot(configure(), self.conversation_id)
 
     def get_latest_ask_from_xiaoai(self):
+        print("{__class__.__name__}:{get_latest_ask_from_xiaoai.__name__}")
         r = self.s.get(
             LATEST_ASK_API.format(
                 hardware=self.hardware, timestamp=str(int(time.time() * 1000))
@@ -115,6 +121,7 @@ class MiGPT:
         return r.json()
 
     def get_last_timestamp_and_record(self, data):
+        print("{__class__.__name__}:{get_last_timestamp_and_record.__name__}")
         if d := data.get("data"):
             records = json.loads(d).get("records")
             last_record = records[0]
@@ -124,11 +131,13 @@ class MiGPT:
             return 0, None
 
     def do_action(self, command, value):
+        print("{__class__.__name__}:{do_action.__name__}")
         # print(f"MiService: do_action {command}:{value}")
         result = subprocess.run(["micli", command, value])
         print(f"MiService: do_action {command}: done, {result}")
 
     def normalize(self, message):
+        print("{__class__.__name__}:{normalize.__name__}")
         message = message.replace(" ", "，")
         message = message.replace("\n", "，")
         message = message.replace("\"", "，")
@@ -136,6 +145,7 @@ class MiGPT:
         return message
 
     def run_forever(self):
+        print("{__class__.__name__}:{normalize.__name__}")
         self.do_action(self.tts_command, f"正在启动小爱同学和{USER_NAME}的智能语音助手的连接,请稍等哦")
         data = list(self.chatbot.ask(CHATGPT_PROMPT))[-1]
         if message := data.get("message", ""):
