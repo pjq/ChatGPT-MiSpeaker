@@ -220,7 +220,7 @@ if __name__ == "__main__":
         "--conversation_id",
         dest="conversation_id",
         type=str,
-        default="c379851d-fbd4-479e-a716-dddc379fbxxx",
+        default="",
         help="ChatGPT conversation_id",
     )
     options = parser.parse_args()
